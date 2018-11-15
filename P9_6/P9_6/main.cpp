@@ -54,30 +54,13 @@ int main(int argc, const char * argv[]) {
     }
 
     vector<JunkMail*> mail;
-    //cout << "template: \n" << templ << endl;
     
     for (int i = 0; i < dblines.size(); i++){
         mail.push_back(new JunkMail(dblines[i], templ));
-        //cout << "dblines[" << i << "]: " << dblines[i] << endl;
     }
-    /*
-    for (int i = 0; i < mail.size(); i++){
-        vector<string> mailtags = mail[i]->get_tags();
-        cout << "mail[" << i << "]" << endl;
-        for (int j = 0; j < mailtags.size(); j++){
-            cout << "   tag[" << j << "]: " << mailtags[j] << endl;
-        }
-    }
-     */
     cout << "\n\n";
     
     for (int i = 0; i < mail.size(); i++){
-        /*
-        vector<string> filled_template = mail[i]->get_filled_template_vector();
-        for (int j = 0; j < filled_template.size(); j++){
-            cout << "FT[" << j << "]: " << filled_template[j] << endl;
-        }
-        */
         cout << "FT[" << i << "]: \n" << mail[i]->get_filled_template_string() << endl;
         mail[i] = NULL;
         delete mail[i];

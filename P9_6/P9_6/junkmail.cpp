@@ -29,10 +29,6 @@ void JunkMail::make_tags(){
     }
 }
 void JunkMail::fill_templ(){
-    //std::cout << "CURRENT DBLINE: \n" << dbline << "\n" << std::endl;
-    //std::cout << "CURRENT TEMPLATE: \n" << templ << "\n" << std::endl;
-    //std::cout << "CURRENT NUM_FIELDS: " << num_fields << "\n" << std::endl;
-    
     int start = 0, end = 0;
     std::string line = "";
     
@@ -43,8 +39,7 @@ void JunkMail::fill_templ(){
             line += templ.substr(start, (end-start)+1);
             if (j+1 < templ.length()-1){
                 start = j+1;
-            } 
-            //line += "\n";
+            }
             filled_templ.push_back(line);
             line = "";
         }

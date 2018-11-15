@@ -30,30 +30,15 @@ int main(int argc, const char * argv[]) {
     string db_employees = "/Users/christianmeyer/cpp/ch9/P9_7/db_employees";
     // new output after Employee data members are changed.
     string db_employees_output = "/Users/christianmeyer/cpp/ch9/P9_7/db_employees_output";
+    string db_employees_sorted = "/Users/christianmeyer/cpp/ch9/P9_7/db_employees_sorted";
     
     fstream fs;
-    fs.open(db_original.c_str(), ios::in | ios::out);
-    if (fs.fail()){
-        cout << "Could not open file " << db_original << endl;
-        exit(1);
-    }
-    fs.seekg(0, ios::end);
-    int tellg = (int)(fs.tellg());
-    fs.seekg(0, ios::beg);
-    cout << "(in db_original)" << endl;
-    cout << "tellg: " << tellg << endl;
-    int record_size = HELPERS::max_record_size(fs, db_original);
-    // ^ Wrong number of record here. An #avg_record_size would probably be a little better, but just following along the lines of examples in book. Note: #max_record_size is all that is needed when the record sizes are fixed. The records here, in db_original, are the ones that are problematic, since those record sizes are variable.
-    int nrecord = tellg / record_size;
-    cout << "avg_record_size: " << record_size << endl;
-    cout << "nrecord: " << nrecord << endl;
-    fs.close();
-
     fs.open(db_original.c_str());
     if (fs.fail()){
         cout << "Could not open file " << db_original << endl;
         exit(1);
     }
+    // this vector contains records as the type vector<string>, and each vector<string> contains the fields for an individual record.
     vector<vector<string> > tags = HELPERS::make_tags(fs);
     vector<int> buffer_sizes;
     int num_tags = tags[0].size();
@@ -68,23 +53,7 @@ int main(int argc, const char * argv[]) {
     HELPERS::output_new_buf_sizes(tags, buffer_sizes, ofs, db_original_output, tag_fields);
     ofs.close();
     
-    fs.open(db_original_output.c_str());
-    if (fs.fail()){
-        cout << "Could not open file " << db_original_output << endl;
-        exit(1);
-    }
-    fs.seekg(0, ios::end);
-    tellg = (int)(fs.tellg());
-    fs.seekg(0, ios::beg);
-    cout << "(in db_original_output)" << endl;
-    cout << "tellg: " << tellg << endl;
-    record_size = HELPERS::max_record_size(fs, db_original);
-    nrecord = tellg / record_size;
-    cout << "avg_record_size: " << record_size << endl;
-    cout << "nrecord: " << nrecord << " (+1 for header)" << endl;
-    fs.close();
-    cout << "\n";
-    
+    // Make new employee objects using the tags created by reading the db_original file contents
     vector<Employee*> employees;
     for (int i = 0; i < tags.size(); i++){
         Employee* e = new Employee();
@@ -94,18 +63,9 @@ int main(int argc, const char * argv[]) {
         employees.push_back(e);
     }
     
+    // This is the massive print out of employee objects to the console
     HELPERS::print_employees(employees);
-    
-    ofs.open(db_employees.c_str(), ios::in | ios::out | ios::trunc);
-    if (ofs.fail()){
-        cout << "Could not open file " << db_employees << endl;
-        exit(1);
-    }
-    for (int i = 0; i < employees.size(); i++){
-        string line = *((*employees[i])[8]);
-        ofs << line;
-    }
-    ofs.close();
+    cout << "\n";
     
     ofs.open(db_employees.c_str(), ios::in | ios::out | ios::trunc);
     if (ofs.fail()){
@@ -130,6 +90,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     
+    // Employee objects printed out again to observe change in salary
     HELPERS::print_employees(employees);
     
     fs.open(db_employees.c_str());
@@ -150,41 +111,46 @@ int main(int argc, const char * argv[]) {
     fs.close();
     HELPERS::output_new_buf_sizes(tags, buffer_sizes, ofs, db_employees_output, tag_fields);
     ofs.close();
+    // ^ Note: Confusing that half the helper functions are given fstream obj and a string name, and are expected to open and close within function scope, while other half are opened in closed in main scope to avoid having to pass a string. If I had to guess, best practice would be to open and close in main. At the same time, this could mean not knowing the file string within the function definition. Figure out what is prefered and how to handle the former case if it's really the best practice.
     cout << "\n";
     
-    fs.open(db_employees.c_str());
-    if (fs.fail()){
-        cout << "Could not open file " << db_employees << endl;
-        exit(1);
-    }
-    fs.seekg(0, ios::end);
-    tellg = (int)(fs.tellg());
-    fs.seekg(0, ios::beg);
-    cout << "(in db_employees)" << endl;
-    cout << "tellg: " << tellg << endl;
-    record_size = HELPERS::max_record_size(fs, db_employees);
-    nrecord = tellg / record_size;
-    cout << "avg_record_size: " << record_size << endl;
-    cout << "nrecord: " << nrecord << endl;
-    fs.close();
+    // By choosing 4 here, for example, the new file provided to the helper below 'db_employees_sorted' will contain the same contents in 'db_employees_output', but will be sorted by the 4th perameter, which is address.
+    int employee_field_index = 2;
+    // v Note: if db_employeed_sorted is given as the final perameter (optional), the contents of db_employees_output does not change.
+    HELPERS::sort_lines_by_field(buffer_sizes, fs, db_employees_output, employee_field_index, db_employees_sorted);
     cout << "\n";
     
-    fs.open(db_employees_output.c_str());
-    if (fs.fail()){
-        cout << "Could not open file " << db_employees_output << endl;
-        exit(1);
+    cout << "File " << db_employees_sorted << " was sorted by " << tag_fields[employee_field_index] << ".\n";
+    
+    // Now need to do a binary search in the new file (or old) using the same employee_field_index as the one used in #sort_lines_by_field (otherwise, binary search would not be performed on sorted contents anyway).
+    
+    string search = "Lawson";
+    cout << "Searching " << db_employees_sorted << " for keyword " << search << " in field " << tag_fields[employee_field_index] << ".\n" << endl;
+    int word_search_pos = HELPERS::binary_search_by_field(buffer_sizes, fs, db_employees_sorted, employee_field_index, search);
+    //cout << "search_pos = " << word_search_pos << endl;
+    
+    if (word_search_pos != 0){
+        cout << "Word \"" << search << "\" found at position " << word_search_pos << ".\n";
+        fs.open(db_employees_sorted.c_str(), ios::in | ios::out);
+        fs.seekg(word_search_pos, ios::beg);
+        string search_word;
+        getline(fs, search_word, '|');
+        fs.close();
+        cout << "\n";
     }
-    fs.seekg(0, ios::end);
-    tellg = (int)(fs.tellg());
-    fs.seekg(0, ios::beg);
-    cout << "(in db_employees_output)" << endl;
-    cout << "tellg: " << tellg << endl;
-    record_size = HELPERS::max_record_size(fs, db_employees_output);
-    nrecord = tellg / record_size;
-    cout << "avg_record_size: " << record_size << endl;
-    cout << "nrecord: " << nrecord << " (+1 for header)" << endl;
-    fs.close();
-    cout << "\n";
+    
+    int line_search_pos = HELPERS::binary_search_by_field(buffer_sizes, fs, db_employees_sorted, employee_field_index, search, true);
+    //cout << "line_search_pos = " << line_search_pos << endl;
+    if (line_search_pos != 0){
+        cout << "Line containing \"" << search << "\" found at position " << line_search_pos << ".\n";
+        fs.open(db_employees_sorted.c_str(), ios::in | ios::out);
+        fs.seekg(line_search_pos, ios::beg);
+        string search_line;
+        getline(fs, search_line);
+        cout << "Output: " << search_line << endl;
+        fs.close();
+        cout << "\n";
+    }
     
     return 0;
 }

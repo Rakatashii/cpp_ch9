@@ -21,6 +21,13 @@ namespace HELPERS{
     extern void print_employees(std::vector<Employee*> employees);
     
     //extern std::vector<Employee*> make_employees_with_tags(std::vector<std::vector<std::string> > tags);
+    
+    extern int get_sum_buffer_sizes(std::vector<int> bs, int current_index);
+    extern bool check_for_header(std::fstream& fs);
+    extern void sort_lines_by_field(std::vector<int> bs, std::fstream& fs, std::string file, int employee_field_index, std::string new_output = "0");
+    extern int binary_search_by_field(std::vector<int> bs, std::fstream& fs, std::string file, int employee_field_index, std::string search, bool whole_line = false);
+    
+    //extern find_by_name(std::string name, ifstream& ifs, int )
 };
 
 #endif /* helpers_hpp */

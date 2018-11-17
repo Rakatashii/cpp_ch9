@@ -278,7 +278,6 @@ void set_command_line_variables(int argc, const char * argv[], string& input_fil
                 cout << "TRUE \"-k\"" << endl;
                 if (argc > 3){
                     key = argv[3];
-                    //cout << "key: " << key << endl;
                 }
                 if (argc > 4){
                     input_file += argv[4];

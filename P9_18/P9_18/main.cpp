@@ -8,6 +8,7 @@
  To run the program call: './program INPUT_FILE OUTPUT_FILE'
     - INPUT_FILE is optional. If not provided a file called "${project_directory}/roughdraft" is used instead.
     - OUTPUT_FILE is also optional. If not provided then output will only be displayed on the console and no file will be given ouput.
+ Note: files are set later by file = project_directory + argv[n]; So, for now, the file must be in the project directly and only the name of that file should be provided as an arg.
 */
 
 #include <iostream>

@@ -3,9 +3,11 @@
  Write a program that checks the spelling of all words in a file. It should read each word of a file and check whether it is contained in a word list. A word list is available on most UNIX systems in the file /usr/dict/words. The program should print out all words that it cannot find in the word list.
 */
 
-/* This program prints the contents of the input file to the console in color - green denotes a correctly spelled word while red denotes a misspelled word.
-    To run the program call: './program_name input_file'
-    - input_file is optional - if not provided a file called "${project_directory}/roughdraft" is used instead.
+/*
+ This program prints the contents of the input file to the console in color - green denotes a correctly spelled word while red denotes a misspelled word.
+ To run the program call: './program INPUT_FILE OUTPUT_FILE'
+    - INPUT_FILE is optional. If not provided a file called "${project_directory}/roughdraft" is used instead.
+    - OUTPUT_FILE is also optional. If not provided then output will only be displayed on the console and no file will be given ouput.
 */
 
 #include <iostream>
@@ -28,10 +30,10 @@ int main(int argc, const char * argv[]) {
     }
     
     string dir = "/Users/christianmeyer/cpp/ch9/P9_18/";
-    string roughdraft = dir + "roughdraft";
+    string roughdraft = dir + "roughdraft"; // this is the default input file, which will not be used at all if an input file is provided in argv[1]
     string dict_file = dir + "words"; // this is '/usr/share/dict' copied to the project directory
     string input_file;
-    string output_file = "NONE";
+    string output_file = "NONE"; // No output file unless one is provided in argv[2]
     if (argc>1){
         input_file = dir+argv[1];
     } else input_file = roughdraft;
